@@ -7,6 +7,6 @@ Note that the original paper link is on [TorchCV](https://github.com/donnyyou/to
 
 
 ## Notice
-Now for better and easy usage, I decide opensource another repo incluing SFnet models which are better than orginal paper（including SFnetv2, which achieves better results than orginial one）. 
+Now for better and easy usage, I decide opensource another repo incluing SFnet models which are better than orginal paper（including SFnetv2, which achieves better results than orginial ones）. 
 
 **The code and models will be released before ECCV conference.**
