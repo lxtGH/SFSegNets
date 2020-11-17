@@ -10,4 +10,4 @@ However, that repo is over-complex.
 ## Notice
 Now for better and easy usage, I decide opensource another repo incluing SFnet models which are better than orginal paper.
 
-**The code and models will be released in a month.**
+**The code and models will be released in a week.**
