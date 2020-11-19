@@ -1,5 +1,5 @@
 # SFSegNets
-Reproduced Implementation of Our ECCV oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
+Reproduced Implementation of Our ECCV-2020 oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
  
 ![avatar](./figs/sfnet_res.png)
 Our methods achieve the best speed and accuracy trade-off on multiple scene parsing datasets.  
@@ -70,6 +70,7 @@ Thanks to **SenseTime Research** for Reproducing All these model ckpts and pretr
 ## Citation
 If you find this repo is useful for your research, Please consider citing our paper:
 
+
 ```
 @inproceedings{sfnet,
   title={Semantic Flow for Fast and Accurate Scene Parsing},
@@ -78,3 +79,4 @@ If you find this repo is useful for your research, Please consider citing our pa
   year={2020}
 }
 ```
+
