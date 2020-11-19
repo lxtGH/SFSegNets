@@ -7,7 +7,7 @@ srun --mpi=pmi2 -p pat_saturn -n1 --gres=gpu:8 --ntasks-per-node=1 --job-name=wi
 python -m torch.distributed.launch --nproc_per_node=8 train.py \
   --dataset cityscapes \
   --cv 0 \
-  --arch network.sfnet_resnet.DeepR18_SF_deeply \
+  --arch network.sfnet_resnet.DeepR101_SF_deeply \
   --class_uniform_pct 0.5 \
   --class_uniform_tile 1024 \
   --lr 0.01 \
@@ -27,7 +27,7 @@ python -m torch.distributed.launch --nproc_per_node=8 train.py \
   --wt_bound 1.0 \
   --bs_mult 2 \
   --apex \
-  --exp cityscapes_SFsegnet_res18 \
+  --exp cityscapes_SFsegnet_res101 \
   --ckpt ${EXP_DIR}/ \
   --tb_path ${EXP_DIR}/ \
   2>&1 | tee  ${EXP_DIR}/log_${now}.txt &

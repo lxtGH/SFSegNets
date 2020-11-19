@@ -16,3 +16,5 @@ dist/
 *.so
 .torch
 .DS_Store
+outputs/
+pretrained_models/

@@ -10,7 +10,6 @@ python -m torch.distributed.launch --nproc_per_node=8 train.py \
   --arch network.sfnet_resnet.DeepR18_SF_deeply_dsn \
   --class_uniform_pct 0.5 \
   --class_uniform_tile 1024 \
-  --max_cu_epoch 180 \
   --lr 0.01 \
   --lr_schedule poly \
   --poly_exp 1.0 \
