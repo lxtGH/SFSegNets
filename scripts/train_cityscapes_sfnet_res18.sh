@@ -3,7 +3,6 @@ now=$(date +"%Y%m%d_%H%M%S")
 EXP_DIR=./sfets/sfnet_res18_300e_128_inplanes
 mkdir -p ${EXP_DIR}
 # Example on Cityscapes by resnet50-deeplabv3+ as baseline
-srun --mpi=pmi2 -p pat_saturn -n1 --gres=gpu:8 --ntasks-per-node=1 --job-name=wider-resnet38 --kill-on-bad-exit=1 \
 python -m torch.distributed.launch --nproc_per_node=8 train.py \
   --dataset cityscapes \
   --cv 0 \
