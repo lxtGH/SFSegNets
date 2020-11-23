@@ -1,5 +1,5 @@
 # SFSegNets
-Reproduced Implementation of Our ECCV-2020 oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
+Reproduced Implementation of Our ECCV oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
  
 ![avatar](./figs/sfnet_res.png)
 Our methods achieve the best speed and accuracy trade-off on multiple scene parsing datasets.  
@@ -20,7 +20,7 @@ opencv-python
 
 ## Pretrained models and Trained CKPTs
 Please download the pretrained model including:
-resnet18-deep-stem-pytorch:[link](https://drive.google.com/file/d/1AI-VIQPvF9HDsCnpsLwlw1cGnLot5xFD/view?usp=sharing)
+resnet18-deep-stem-pytorch:[link](https://drive.google.com/file/d/16mcWZSWbV3hkFWJ2cP_eJRQ6Nr1BncCp/view?usp=sharing)
 
 dfnetv1:[link](https://drive.google.com/file/d/1xkkmIjKUbMifcrKdWU7I_-Jx_1YQAXfN/view?usp=sharing)
 

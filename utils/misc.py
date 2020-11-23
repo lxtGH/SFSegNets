@@ -3,14 +3,12 @@ Miscellanous Functions
 """
 
 import sys
-import re
+import time
 import os
 import shutil
 import torch
 from datetime import datetime
 import logging
-from subprocess import call
-import shlex
 from tensorboardX import SummaryWriter
 import numpy as np
 import torchvision.transforms as standard_transforms
@@ -309,3 +307,23 @@ def set_bn_eval(m):
     if classname.find('BatchNorm') != -1:
         m.eval()
 
+def speed_test(model, size=896, iteration=100):
+    input_t = torch.Tensor(1, 3, size, size).cuda()
+
+    print("start warm up")
+
+    for i in range(10):
+        model(input_t)
+
+    print("warm up done")
+    start_ts = time.time()
+    for i in range(iteration):
+        model(input_t)
+
+    torch.cuda.synchronize()
+    end_ts = time.time()
+
+    t_cnt = end_ts - start_ts
+    print("=======================================")
+    print("FPS: %f" % (100 / t_cnt))
+    print(f"Inference time {t_cnt/100*1000} ms")
