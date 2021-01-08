@@ -13,6 +13,7 @@ However, that repo is over-complex for further research and exploration.
 ## DataSet Setting
 Please see the DATASETs.md for the details.
 
+
 ## Requirements
 
 pytorch >= 1.2.0
@@ -27,6 +28,7 @@ dfnetv1:[link](https://drive.google.com/file/d/1xkkmIjKUbMifcrKdWU7I_-Jx_1YQAXfN
 
 dfnetv2:[link](https://drive.google.com/file/d/1ZRRE99BPhbXwq-ZzO8A5GFmfCe7zxMsz/view?usp=sharing)
 
+sf-resnet18-Mapillary:[link](https://drive.google.com/file/d/1Hq7HhszrAicAr2PnbNN880ijAYcxJJ0I/view?usp=sharing)
 
 and put them into the pretrained_models dir.
 
@@ -35,6 +37,8 @@ Please download the trained model, the mIoU is on Cityscape validation dataset.
 resnet18(no-balanced-sample): 78.4 mIoU 
 
 resnet18: 79.0 mIoU [link](https://drive.google.com/file/d/1X7w1HYrSXOJBkfRJuxtXdmR0BXUR-hR8/view?usp=sharing)
+
+resnet18 + map: 79.9 mIoU [link](https://drive.google.com/file/d/1wiJC_skx8MaZD6B0waz0CWnQBUlcQ6UD/view?usp=sharing) 
 
 resnet50: 80.4 mIoU [link](https://drive.google.com/file/d/1oAOPISp_Rqva_9whsF7eE3pFxuGSc1Wf/view?usp=sharing)
 
@@ -47,8 +51,8 @@ dfnetv2: 75.8 mIoU [link](https://drive.google.com/file/d/1iGE9IYImdrs5p0i3k85Oo
 
 ## Training 
 
-The train settings require 8 GPU with at least 11GB memory.
-
+The train settings require 8 GPU with at least 11GB memory. 
+Please download the pretrained models before training.
 
 Train ResNet18 model
 ```bash
