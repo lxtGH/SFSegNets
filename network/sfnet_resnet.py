@@ -88,7 +88,7 @@ class UperNetAlignHead(nn.Module):
         out = []
         for i in reversed(range(len(conv_out) - 1)):
             conv_x = conv_out[i]
-            conv_x = self.fpn_in[i](conv_x)  # lateral branch
+            conv_x = self.fpn_in[i](conv_x) 
             f = self.fpn_out_align[i]([conv_x, f])
             f = conv_x + f
             fpn_feature_list.append(self.fpn_out[i](f))
