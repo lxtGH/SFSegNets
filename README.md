@@ -46,6 +46,7 @@ Please download the trained model, the mIoU is on Cityscape validation dataset.
 resnet18(no-balanced-sample): 78.4 mIoU 
 
 resnet18: 79.0 mIoU [link](https://drive.google.com/file/d/1X7w1HYrSXOJBkfRJuxtXdmR0BXUR-hR8/view?usp=sharing)
++dsn [link](https://drive.google.com/file/d/1-U6NzJ0vb3q4Ev7YZ5FkL9X0L__bozM2/view?usp=sharing)
 
 resnet18 + map: 79.9 mIoU [link](https://drive.google.com/file/d/1wiJC_skx8MaZD6B0waz0CWnQBUlcQ6UD/view?usp=sharing) 
 
