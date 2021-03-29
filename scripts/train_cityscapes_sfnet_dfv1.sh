@@ -18,6 +18,7 @@ python -m torch.distributed.launch --nproc_per_node=8 train.py \
   --syncbn \
   --sgd \
   --ohem \
+  --fpn_dsn_loss \
   --crop_size 1024 \
   --scale_min 0.5 \
   --scale_max 2.0 \

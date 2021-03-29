@@ -62,11 +62,8 @@ dfnetv2: 75.8 mIoU [link](https://drive.google.com/file/d/1iGE9IYImdrs5p0i3k85Oo
 
 ### Visualization Results
 
-python ./demo/demo_folder_decouple.py
+python demo_folder.py --snapshot ckpt_path --demo_floder images_folder --save_dir save_dir_to_disk
 
-### Visualization the Semantic Flow 
-
-python ./demo/demo_semantic_flow.py
 
 
 ## Training 
@@ -89,7 +86,6 @@ sh ./scripts/train/train_cityscapes_sfnet_res101.sh
 
 ```bash
 sh ./scripts/submit_test/submit_cityscapes_sfnet_res101.sh
-
 ```
 
 

@@ -12,7 +12,7 @@ import torch
 from torch.backends import cudnn
 import torchvision.transforms as transforms
 
-import network
+from network import get_net
 from optimizer import restore_snapshot
 from datasets import cityscapes
 from config import assert_and_infer_cfg
@@ -21,7 +21,7 @@ from utils.misc import save_log
 parser = argparse.ArgumentParser(description='demo')
 parser.add_argument('--demo_folder', type=str, default='', help='path to the folder containing demo images')
 parser.add_argument('--snapshot', type=str, default='./pretrained_models/cityscapes_best.pth', help='pre-trained checkpoint')
-parser.add_argument('--arch', type=str, default='network.deepv3.DeepWV3Plus', help='network architecture used for inference')
+parser.add_argument('--arch', type=str, default='network.sfnet_resnet.DeepR18_SF_deeply_dsn', help='network architecture used for inference')
 parser.add_argument('--save_dir', type=str, default='./save', help='path to save your results')
 args = parser.parse_args()
 assert_and_infer_cfg(args, train_mode=False)
@@ -36,7 +36,7 @@ save_log('log', log_dir, date_str, rank=0)
 
 # get net
 args.dataset_cls = cityscapes
-net = network.get_net(args, criterion=None)
+net = get_net(args, criterion=None)
 net = torch.nn.DataParallel(net).cuda()
 logging.info('Net built.')
 net, _ = restore_snapshot(net, optimizer=None, snapshot=args.snapshot, restore_optimizer_bool=False)
@@ -65,33 +65,16 @@ for img_id, img_name in enumerate(images):
 
     # predict
     with torch.no_grad():
-        pred, edge, body = net(x=img_tensor.unsqueeze(0).cuda(), img_num=img_id)
+        pred = net(x=img_tensor.unsqueeze(0).cuda())
         logging.info('%04d/%04d: Inference done.' % (img_id + 1, len(images)))
 
     # final mask
     pred = pred.cpu().numpy().squeeze()
     pred = np.argmax(pred, axis=0)
 
-
-    # body mask
-    body = body.cpu().numpy().squeeze()
-    body = np.argmax(body, axis=0)
-
-    # edge map
-    edge = edge.cpu().numpy().squeeze()
-    edge_mask = np.zeros(edge.shape)
-    edge_mask[edge >= 0.8] = 255
-
     # final mask
     color_name = 'color_mask_' + img_name
     overlap_name = 'overlap_' + img_name
-
-    # body mask
-    body_color_name = 'body_mask_' + img_name
-    body_overlap_name = 'body_overlap_' + img_name
-
-    # edge mask
-    edge_mask_name = "edge_mask_" + img_name
 
     # save colorized predictions
     colorized = args.dataset_cls.colorize_mask(pred)
@@ -100,17 +83,6 @@ for img_id, img_name in enumerate(images):
     # save colorized predictions overlapped on original images
     overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized.convert('RGB')), 0.5, 0)
     cv2.imwrite(os.path.join(args.save_dir, overlap_name), overlap[:, :, ::-1])
-
-    # save colorized body predictions
-    colorized_body = args.dataset_cls.colorize_mask(body)
-    colorized_body.save(os.path.join(args.save_dir, color_name))
-
-    # save colorized body predictions overlapped on original images
-    overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized_body.convert('RGB')), 0.5, 0)
-    cv2.imwrite(os.path.join(args.save_dir, body_overlap_name), overlap[:, :, ::-1])
-
-    # save edge map
-    cv2.imwrite(os.path.join(args.save_dir, edge_mask_name), edge_mask)
 
 
 end_time = time.time()
