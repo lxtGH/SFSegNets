@@ -8,6 +8,120 @@ import torch.nn.functional as F
 
 from network.nn.mynn import Upsample, Norm2d
 
+class ChannelReasonModule(nn.Module):
+    """
+    Spatial CGNL block with dot production kernel for image classfication.
+    """
+    def __init__(self, inplanes, planes, groups=None, node_num=32):
+        if groups == None:
+            groups = planes
+        self.groups = groups
+        super(ChannelReasonModule, self).__init__()
+        # conv theta
+        self.t = nn.Conv2d(inplanes, planes, kernel_size=1, stride=1, bias=False)
+        # conv phi
+        self.p = nn.Conv2d(inplanes, planes, kernel_size=1, stride=1, bias=False)
+        # conv g
+        self.g = nn.Conv2d(inplanes, planes, kernel_size=1, stride=1, bias=False)
+        # conv z
+        self.z = nn.Conv2d(planes, inplanes, kernel_size=1, stride=1,
+                                                  groups=self.groups, bias=False)
+        self.gn = nn.GroupNorm(num_groups=self.groups, num_channels=inplanes)
+
+        self.node_num = node_num
+        self.node_fea = planes // node_num
+
+        #  Adjacency Matrix: A_g
+        self.conv_adj = nn.Conv1d(self.node_num, self.node_num, kernel_size=1, bias=False)
+        self.bn_adj = nn.BatchNorm1d(self.node_num)
+
+        #  State Update Function: W_g
+        self.conv_wg = nn.Conv1d(self.node_fea, self.node_fea, kernel_size=1, bias=False)
+        self.bn_wg = nn.BatchNorm1d(self.node_fea)
+        self.relu = nn.ReLU()
+
+    def kernel(self, p, g, b, c, h, w):
+        """The linear kernel (dot production).
+        Args:
+            p: output of conv phi
+            g: output of conv g
+            b: batch size
+            c: channels number
+            h: height of featuremaps
+            w: width of featuremaps
+        """
+        p = p.view(b, 1, c * h * w)
+        g = g.view(b, c * h * w, 1)
+
+        att = torch.bmm(p, g)
+
+        return att
+
+    def forward(self, x):
+        residual = x
+        t = self.t(x)
+        p = self.p(x)
+        g = self.g(x)
+        b, c, h, w = t.size()
+
+        assert self.groups and self.groups > 1
+        _c = int(c / self.groups)
+
+        ps = torch.split(p, split_size_or_sections=_c, dim=1)
+        gs = torch.split(g, split_size_or_sections=_c, dim=1)
+
+        _t_sequences = []
+
+        for i in range(self.groups):
+            _x = self.kernel(ps[i], gs[i],
+                             b, _c, h, w)
+            _t_sequences.append(_x)
+
+        x = torch.cat(_t_sequences, dim=1)
+
+        z_idt = torch.split(x, split_size_or_sections=self.node_num, dim=1)
+        res = []
+        for i in z_idt:
+            res.append(i)
+        z_idt = torch.cat(res, dim=2)
+
+        z = self.conv_adj(z_idt)
+        z = self.bn_adj(z)
+        z = self.relu(z)
+
+        # Laplacian smoothing: (I - A_g)Z => Z - A_gZ
+        z += z_idt
+
+        z = z.transpose(1, 2).contiguous()
+        z = self.conv_wg(z)
+        z = self.bn_wg(z)
+        z = self.relu(z)
+        z = z.transpose(1, 2).contiguous()
+        c, n, f = z.size()
+        z = z.reshape(c, -1, 1).unsqueeze(2)
+        x = z * t
+        x = self.z(x)
+
+        x = self.gn(x) + residual
+
+        return x
+
+
+class SRHead(nn.Module):
+    """
+        Squeeze-Reasoning Head
+    """
+    def __init__(self, in_dim, middle_dim=256, node=32):
+        super(SRHead, self).__init__()
+        self.down = nn.Sequential(nn.Conv2d(in_dim, middle_dim, kernel_size=1, bias=False),
+                          Norm2d(middle_dim), nn.ReLU(inplace=True))
+        self.sr = ChannelReasonModule(middle_dim, middle_dim, node_num=node)
+
+    def forward(self, x):
+        x_down = self.down(x)
+        x_sr = self.sr(x_down)
+
+        return x_sr
 
 class _AtrousSpatialPyramidPoolingModule(nn.Module):
     """
@@ -184,4 +298,33 @@ class AlignedModule(nn.Module):
         grid = grid + flow.permute(0, 2, 3, 1) / norm
 
         output = F.grid_sample(input, grid)
+        return output
+
+
+class ModuleHead(nn.Module):
+    """
+        CC-Net-like module head
+    """
+    def __init__(self, inplanes, interplanes, outplanes, num_classes, norm_layer=nn.BatchNorm2d, module=None):
+        super(ModuleHead, self).__init__()
+        self.conva = nn.Sequential(nn.Conv2d(inplanes, interplanes, 3, padding=1, bias=False),
+                                   norm_layer(interplanes),
+                                   nn.ReLU(interplanes))
+        self.module = module
+        self.convb = nn.Sequential(nn.Conv2d(interplanes, interplanes, 3, padding=1, bias=False),
+                                   norm_layer(interplanes),
+                                   nn.ReLU(interplanes))
+
+        self.bottleneck = nn.Sequential(
+            nn.Conv2d(inplanes + interplanes, outplanes, kernel_size=3, padding=1, dilation=1, bias=False),
+            norm_layer(outplanes),
+            nn.ReLU(outplanes),
+            nn.Conv2d(outplanes, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
+        )
+
+    def forward(self, x):
+        output = self.conva(x)
+        output = self.module(output)
+        output = self.convb(output)
+        output = self.bottleneck(torch.cat([x, output], 1))
         return output
