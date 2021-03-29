@@ -1,7 +1,8 @@
 # SFSegNets(ECCV-2020-oral)
 Reproduced Implementation of Our ECCV-2020 oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
 **SFnet is the first real time nework which achieves the 80 mIoU on Cityscape test set!!!!**
- 
+It also contains our another concurrent work: SRNet[link](https://arxiv.org/abs/2011.03308).
+
 ![avatar](./figs/sfnet_res.png)
 Our methods achieve the best speed and accuracy trade-off on multiple scene parsing datasets.  
 
@@ -21,16 +22,24 @@ apex
 opencv-python
 
 ## Pretrained models and Trained CKPTs
-Please download the pretrained model including:
+Please download the pretrained models and put them into the pretrained_models dir.
+
+### pretrained imagenet models
+
+resnet101-deep-stem-pytorch:[link](https://drive.google.com/file/d/11s2vaTV71Lc160TMulrmodletcEgRYqi/view?usp=sharing)
+
+resnet50-deep-stem-pytorch:[link](https://drive.google.com/file/d/1H2LhFcDZy6-4K5Yfs-8mHbTSe3WdaTrd/view?usp=sharing)
+
 resnet18-deep-stem-pytorch:[link](https://drive.google.com/file/d/16mcWZSWbV3hkFWJ2cP_eJRQ6Nr1BncCp/view?usp=sharing)
 
 dfnetv1:[link](https://drive.google.com/file/d/1xkkmIjKUbMifcrKdWU7I_-Jx_1YQAXfN/view?usp=sharing)
 
 dfnetv2:[link](https://drive.google.com/file/d/1ZRRE99BPhbXwq-ZzO8A5GFmfCe7zxMsz/view?usp=sharing)
 
+### trained ckpts:
+
 sf-resnet18-Mapillary:[link](https://drive.google.com/file/d/1Hq7HhszrAicAr2PnbNN880ijAYcxJJ0I/view?usp=sharing)
 
-and put them into the pretrained_models dir.
 
 Please download the trained model, the mIoU is on Cityscape validation dataset.
 
@@ -49,9 +58,20 @@ dfnetv1: 72.2 mIoU [link](https://drive.google.com/file/d/1aP9d4QVbGvBTABOFvi-ok
 dfnetv2: 75.8 mIoU [link](https://drive.google.com/file/d/1iGE9IYImdrs5p0i3k85OoCQzuSUNhjNU/view?usp=sharing)
 
 
+## Demo 
+
+### Visualization Results
+
+python ./demo/demo_folder_decouple.py
+
+### Visualization the Semantic Flow 
+
+python ./demo/demo_semantic_flow.py
+
+
 ## Training 
 
-The train settings require 8 GPU with at least 11GB memory. 
+The train settings require 8 GPU with at least **11GB** memory. 
 Please download the pretrained models before training.
 
 Train ResNet18 model
@@ -65,12 +85,13 @@ Train ResNet101 models
 sh ./scripts/train/train_cityscapes_sfnet_res101.sh
 ```
 
+## Submission for test 
 
+```bash
+sh ./scripts/submit_test/submit_cityscapes_sfnet_res101.sh
 
-## Acknowledgement 
-This repo is based on Semantic Segmentation from [NVIDIA](https://github.com/NVIDIA/semantic-segmentation) and [DecoupleSegNets](https://github.com/lxtGH/DecoupleSegNets)
+```
 
-Thanks to **SenseTime Research** for Reproducing All these model ckpts and pretrained model.
 
 ## Citation
 If you find this repo is useful for your research, Please consider citing our paper:
@@ -83,5 +104,19 @@ If you find this repo is useful for your research, Please consider citing our pa
   booktitle={ECCV},
   year={2020}
 }
+
+@article{Li2020SRNet,
+  title={Towards Efficient Scene Understanding via Squeeze Reasoning},
+  author={Xiangtai Li and Xia Li and Ansheng You and Li Zhang and Guang-Liang Cheng and Kuiyuan Yang and Y. Tong and Zhouchen Lin},
+  journal={ArXiv},
+  year={2020},
+  volume={abs/2011.03308}
+}
+
 ```
+
+## Acknowledgement 
+This repo is based on Semantic Segmentation from [NVIDIA](https://github.com/NVIDIA/semantic-segmentation) and [DecoupleSegNets](https://github.com/lxtGH/DecoupleSegNets)
+
+Thanks to **SenseTime Research** for Reproducing All these model ckpts and pretrained model.
 

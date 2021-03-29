@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # Implementation of SFNet DFNet series.
-# Author: Xiangtai(lxt@pku.edu.cn)
+# Author: Xiangtai Li(lxt@pku.edu.cn)
 # Date: 2020/7/1
 
 import torch.nn as nn
@@ -30,7 +30,7 @@ class AlignNetDFnet(nn.Module):
             raise ValueError("Not a valid network arch")
 
         self.head = UperNetAlignHead(inplane=512, num_class=num_classes, norm_layer=Norm2d,
-                                    fpn_inplanes=[128, 256, 512], fpn_dim=64, conv3x3_type=flow_conv_type, fpn_dsn=fpn_dsn)
+                                     fpn_inplanes=[128, 256, 512], fpn_dim=64, conv3x3_type=flow_conv_type, fpn_dsn=fpn_dsn)
 
     def forward(self, x, gts=None):
         x_size = x.size()  # 800
