@@ -1,7 +1,7 @@
 # SFSegNets(ECCV-2020-oral)
 Reproduced Implementation of Our ECCV-2020 oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
 **SFnet is the first real time nework which achieves the 80 mIoU on Cityscape test set!!!!**
-It also contains our another concurrent work: SRNet[link](https://arxiv.org/abs/2011.03308).
+It also contains our another concurrent work: SRNet:[link](https://arxiv.org/abs/2011.03308).
 
 ![avatar](./figs/sfnet_res.png)
 Our methods achieve the best speed and accuracy trade-off on multiple scene parsing datasets.  
