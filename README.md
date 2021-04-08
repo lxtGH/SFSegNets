@@ -17,7 +17,7 @@ Please see the DATASETs.md for the details.
 
 ## Requirements
 
-pytorch >= 1.2.0
+pytorch == 1.2.0 or 1.3.0
 apex
 opencv-python
 
