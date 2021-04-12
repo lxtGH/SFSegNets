@@ -10,6 +10,9 @@ Our methods achieve the best speed and accuracy trade-off on multiple scene pars
 Note that the original paper link is on [TorchCV](https://github.com/donnyyou/torchcv) where you can train SFnet models. 
 However, that repo is over-complex for further research and exploration.
 
+## Question and Dissussion 
+
+If you **have any question and or dissussion on fast segmentation**, just open an issue. I will reply asap if I have the spare time.
 
 ## DataSet Setting
 Please see the DATASETs.md for the details.
