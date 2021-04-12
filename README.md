@@ -22,7 +22,7 @@ apex
 opencv-python
 
 ## Pretrained models and Trained CKPTs
-Please download the pretrained models and put them into the pretrained_models dir.
+Please download the pretrained models and put them into the pretrained_models dir on the root of this repo.
 
 ### pretrained imagenet models
 
@@ -64,7 +64,6 @@ dfnetv2: 75.8 mIoU [link](https://drive.google.com/file/d/1iGE9IYImdrs5p0i3k85Oo
 ### Visualization Results
 
 python demo_folder.py --snapshot ckpt_path --demo_floder images_folder --save_dir save_dir_to_disk
-
 
 
 ## Training 
