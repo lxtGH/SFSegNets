@@ -119,3 +119,7 @@ This repo is based on Semantic Segmentation from [NVIDIA](https://github.com/NVI
 
 Thanks to **SenseTime Research** for Reproducing All these model ckpts and pretrained model.
 
+
+
+## License
+MIT
