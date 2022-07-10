@@ -303,6 +303,23 @@ class Resize(object):
                 mask.resize(self.size, Image.NEAREST))
 
 
+class ResizeHW(object):
+    """
+    Resize image to exact size of crop
+    """
+
+    def __init__(self, ow, oh):
+        self.size = ow, oh
+
+    def __call__(self, img, mask):
+        assert img.size == mask.size
+        w, h = img.size
+        if (w == h and w == self.size):
+            return img, mask
+        return (img.resize(self.size, Image.BICUBIC),
+                mask.resize(self.size, Image.NEAREST))
+
+
 class RandomSizedCrop(object):
     def __init__(self, size):
         self.size = size

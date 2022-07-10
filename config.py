@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 
 
 import torch
-
+import apex
 
 from utils.attr_dict import AttrDict
 
@@ -50,8 +50,9 @@ __C.DATASET.KITTI_AUG_DIR = ''
 # Camvid Dataset Dir Location
 __C.DATASET.CAMVID_DIR = './data/camVid'
 # BDD Dataset Dir Location
-__C.DATASET.BDD_DIR = './data/BDD/seg'
-
+__C.DATASET.BDD_DIR = './data/bdd'
+# IDD Dataset
+__C.DATASET.IDD_DIR = './data/IDD'
 #Number of splits to support
 __C.DATASET.CV_SPLITS = 3
 
@@ -72,7 +73,6 @@ def assert_and_infer_cfg(args, make_immutable=True, train_mode=True):
 
     if hasattr(args, 'syncbn') and args.syncbn:
         if args.apex:
-            import apex
             __C.MODEL.BN = 'apex-syncnorm'
             __C.MODEL.BNFUNC = apex.parallel.SyncBatchNorm
         else:

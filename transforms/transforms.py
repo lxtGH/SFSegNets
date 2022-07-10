@@ -43,6 +43,9 @@ from scipy.ndimage.interpolation import shift
 
 from skimage.segmentation import find_boundaries
 
+import warnings
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
+
 try:
     import accimage
 except ImportError:

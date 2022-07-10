@@ -1,26 +1,28 @@
 """
-BDD Dataset Loader
+UDS dataset, Merge Driving Dataset Loader
 """
 
 import os
 import sys
 import numpy as np
 from PIL import Image
-import torch
 from torch.utils import data
 import logging
 import datasets.uniform as uniform
-import datasets.edge_utils as edge_utils
 import json
 from config import cfg
 import datasets.cityscapes_labels as cityscapes_labels
 
-# BDD share the same label map as Cityscapes dataset
+# Merge Driving share the same label map as Cityscapes dataset
 trainid_to_name = cityscapes_labels.trainId2name
 
 num_classes = 19
 ignore_label = 255
-root = cfg.DATASET.BDD_DIR
+# set the root of each dataset
+bdd_root = cfg.DATASET.BDD_DIR
+city_root = cfg.DATASET.CITYSCAPES_DIR
+map_root = cfg.DATASET.MAPILLARY_DIR
+idd_root = cfg.DATASET.IDD_DIR
 
 palette = [128, 64, 128, 244, 35, 232, 70, 70, 70, 102, 102, 156, 190, 153, 153,
            153, 153, 153, 250, 170, 30,
@@ -42,64 +44,148 @@ def colorize_mask(mask):
     return new_mask
 
 
-def add_items(img_path, mask_path):
+def add_bdd_items(img_path, mask_path):
     c_items = os.listdir(img_path)
     c_items.sort()
     items = []
-    aug_items = []
     for it in c_items:
-        item = (os.path.join(img_path, it), os.path.join(mask_path, it.split('.')[0] + "_train_id.png"))
+        img_per_path = os.path.join(img_path, it)
+        mask_per_path = os.path.join(mask_path, it.split('.')[0] + "_train_id.png")
+        item = ( img_per_path , mask_per_path)
         items.append(item)
-    return items, aug_items
+    return items
+
+
+def add_idd_items(img_path, mask_path):
+
+    folders = os.listdir(img_path)
+    items = []
+    for f in folders:
+        imgs = os.listdir(os.path.join(img_path, f))
+        for img in imgs:
+            id = img.split('_')[0]
+            img_per_path = os.path.join(img_path, f, img)
+            mask_name = id + "_" + "gtFine_labelids_19labelTrainIds.png"
+            mask_per_path = os.path.join(mask_path, f, mask_name)
+            assert os.path.exists(mask_per_path), print(mask_per_path)
+            items.append((img_per_path, mask_per_path))
+    return items
+
+
+def add_map_items(img_path, mask_path):
+    items = []
+    imgs = os.listdir(img_path)
+    for img in imgs:
+        mask_file = img.split(".")[0] + "_19labelTrainIds.png"
+        img_per_path = os.path.join(img_path, img)
+        mask_per_path = os.path.join(mask_path, mask_file)
+        assert os.path.exists(mask_per_path), print(mask_per_path)
+        items.append((img_per_path, mask_per_path))
+
+    return items
+
+
+def add_city_items(img_path, mask_path):
+
+    citys = os.listdir(img_path)
+    items = []
+    for f in citys:
+        imgs = os.listdir(os.path.join(img_path, f))
+        for img in imgs:
+            id = "_".join(img.split('_')[:-1])
+            img_per_path = os.path.join(img_path, f, img)
+            mask_name = id + "_" + "gtFine_labelTrainIds.png"
+            mask_per_path = os.path.join(mask_path, f, mask_name)
+            assert os.path.exists(mask_per_path), print(mask_per_path)
+            items.append((img_per_path, mask_per_path))
+    return items
 
 
 def make_dataset(quality, mode):
 
-    items = []
-    aug_items = []
     assert quality == 'semantic'
     assert mode in ['train', 'val', 'trainval', 'test']
 
+    train_items = []
+    val_items = []
 
-    img_path = os.path.join(root, 'images', 'train')
-    mask_path = os.path.join(root, 'labels','train')
+    # add bdd datasets
+    img_path = os.path.join(bdd_root, 'images', 'train')
+    mask_path = os.path.join(bdd_root, 'labels', 'train')
 
-    train_items, train_aug_items = add_items(img_path, mask_path)
-    logging.info('BDD has a total of {} train images'.format(len(train_items)))
+    bdd_train_items = add_bdd_items(img_path, mask_path)
+    logging.info('BDD has a total of {} train images'.format(len(bdd_train_items)))
+    train_items.extend(bdd_train_items)
 
-    img_path = os.path.join(root, 'images', 'val')
-    mask_path = os.path.join(root, 'labels', 'val')
+    img_path = os.path.join(bdd_root, 'images', 'val')
+    mask_path = os.path.join(bdd_root, 'labels', 'val')
 
-    val_items, val_aug_items = add_items(img_path, mask_path, )
-    logging.info('BDD has a total of {} validation images'.format(len(val_items)))
+    bdd_val_items = add_bdd_items(img_path, mask_path, )
+    logging.info('BDD has a total of {} validation images'.format(len(bdd_val_items)))
+    val_items.extend(bdd_val_items)
 
-    if mode == 'test':
-        img_path = os.path.join(root, 'test')
-        mask_path = os.path.join(root, 'testannot')
-        test_items, test_aug_items = add_items(img_path, mask_path, )
-        logging.info('BDD has a total of {} test images'.format(len(test_items)))
+    # add mapillary dataset
+
+    map_img_path = os.path.join(map_root, "training", "images")
+    map_mask_path = os.path.join(map_root, "training", "labels")
+    map_train_items = add_map_items(map_img_path, map_mask_path)
+    logging.info('Mapillary has a total of {} train images'.format(len(map_train_items)))
+    train_items.extend(map_train_items)
+
+    map_img_path = os.path.join(map_root, "validation", "images")
+    map_mask_path = os.path.join(map_root, "validation", "labels")
+    map_val_items = add_map_items(map_img_path, map_mask_path)
+    logging.info('Mapillary has a total of {} validation images'.format(len(map_val_items)))
+    val_items.extend(map_val_items)
+
+    # add IDD dataset
+    idd_img_dir = "leftImg8bit"
+    idd_gt_dir = "gtFine"
+    img_path = os.path.join(idd_root, idd_img_dir, 'train')
+    mask_path = os.path.join(idd_root, idd_gt_dir, 'train')
+
+    idd_train_items = add_idd_items(img_path, mask_path)
+    logging.info('IDD has a total of {} train images'.format(len(idd_train_items)))
+    train_items.extend(idd_train_items)
+
+    img_path = os.path.join(idd_root, idd_img_dir, 'val')
+    mask_path = os.path.join(idd_root, idd_gt_dir, 'val')
+
+    idd_val_items = add_idd_items(img_path, mask_path)
+    logging.info('IDD has a total of {} validation images'.format(len(val_items)))
+    val_items.extend(idd_val_items)
+
+    # add cityscapes fine dataset
+    city_img_dir = "leftImg8bit_trainvaltest/leftImg8bit"
+    city_mask_dir = "gtFine_trainvaltest/gtFine"
+
+    img_path = os.path.join(city_root, city_img_dir, 'train')
+    mask_path = os.path.join(city_root,city_mask_dir, "train")
+    city_train_items = add_city_items(img_path, mask_path)
+    logging.info('CityScapes has a total of {} train images'.format(len(city_train_items)))
+    train_items.extend(city_train_items)
+
+    img_path = os.path.join(city_root, city_img_dir, 'val')
+    mask_path = os.path.join(city_root, city_mask_dir, "val")
+    city_val_items = add_city_items(img_path, mask_path)
+    logging.info('CityScapes has a total of {} validation images'.format(len(city_val_items)))
+    val_items.extend(city_val_items)
 
 
     if mode == 'train':
         items = train_items
     elif mode == 'val':
         items = val_items
-    elif mode == 'trainval':
-        items = train_items + val_items
-        aug_items = train_aug_items + val_aug_items
-    elif mode == 'test':
-        items = test_items
-        aug_items = []
     else:
         logging.info('Unknown mode {}'.format(mode))
         sys.exit()
 
-    logging.info('BDD-{}: {} images'.format(mode, len(items)))
+    logging.info('Merged Dataset have -{}: {} images for {}'.format(mode, len(items), mode))
 
-    return items, aug_items
+    return items
 
 
-class BDD(data.Dataset):
+class MergeDrivingDataset(data.Dataset):
 
     def __init__(self, quality, mode, maxSkip=0, joint_transform_list=None,
                  transform=None, target_transform=None, dump_images=False,
@@ -121,12 +207,12 @@ class BDD(data.Dataset):
         self.edge_map = edge_map
         self.centroids = []
 
-        self.imgs, self.aug_imgs = make_dataset(quality, mode)
+        self.imgs = make_dataset(quality, mode)
         assert len(self.imgs), 'Found 0 images, please check the data set'
 
         # Centroids for GT data
         if self.class_uniform_pct > 0:
-            json_fn = 'bdd_tile{}_cv{}_{}.json'.format(self.class_uniform_tile, self.cv_split, self.mode)
+            json_fn = 'merge_drive_tile{}_cv{}_{}.json'.format(self.class_uniform_tile, self.cv_split, self.mode)
 
             if os.path.isfile(json_fn):
                 with open(json_fn, 'r') as json_data:
@@ -142,24 +228,6 @@ class BDD(data.Dataset):
                     json.dump(self.centroids, outfile, indent=4)
 
             self.fine_centroids = self.centroids.copy()
-
-            if self.maxSkip > 0:
-                json_fn = 'bdd_tile{}_cv{}_{}_skip{}.json'.format(self.class_uniform_tile, self.cv_split, self.mode, self.maxSkip)
-                if os.path.isfile(json_fn):
-                    with open(json_fn, 'r') as json_data:
-                        centroids = json.load(json_data)
-                    self.aug_centroids = {int(idx): centroids[idx] for idx in centroids}
-                else:
-                    self.aug_centroids = uniform.class_centroids_all(
-                            self.aug_imgs,
-                            num_classes,
-                            id2trainid=None,
-                            tile_size=class_uniform_tile)
-                    with open(json_fn, 'w') as outfile:
-                        json.dump(self.aug_centroids, outfile, indent=4)
-
-                for class_id in range(num_classes):
-                    self.centroids[class_id].extend(self.aug_centroids[class_id])
 
         self.build_epoch()
 
@@ -217,13 +285,6 @@ class BDD(data.Dataset):
         if self.target_transform is not None:
             mask = self.target_transform(mask)
 
-        if self.edge_map:
-            # _edgemap = np.array(mask_trained)
-            # _edgemap = edge_utils.mask_to_onehot(_edgemap, num_classes)
-            _edgemap = mask[:-1, :, :]
-            _edgemap = edge_utils.onehot_to_binary_edges(_edgemap, 2, num_classes)
-            edgemap = torch.from_numpy(_edgemap).float()
-            return img, mask, edgemap, img_name
         return img, mask, img_name
 
     def __len__(self):

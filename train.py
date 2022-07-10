@@ -14,10 +14,14 @@ from apex import amp
 from config import cfg, assert_and_infer_cfg
 from utils.misc import AverageMeter, prep_experiment, evaluate_eval, fast_hist, set_bn_eval
 from utils.f_boundary import eval_mask_boundary
+
 import datasets
 import loss
 import network
 import optimizer
+import warnings
+warnings.filterwarnings('ignore')
+logging.getLogger().setLevel(logging.INFO)
 
 
 # Argument Parser
@@ -31,6 +35,9 @@ parser.add_argument('--dataset', type=str, default='cityscapes',
 
 parser.add_argument('--cv', type=int, default=None,
                     help='cross-validation split id to use. Default # of splits set to 3 in config')
+
+parser.add_argument('--mode', type=str, default="train",
+                    help='dataset splits to be used')
 
 parser.add_argument('--class_uniform_pct', type=float, default=0.5,
                     help='What fraction of images is uniformly sampled')
@@ -156,6 +163,7 @@ args.world_size = 1
 if args.test_mode:
     args.max_epoch = 2
 
+
 if 'WORLD_SIZE' in os.environ and args.apex:
     args.apex = int(os.environ['WORLD_SIZE']) > 1
     args.world_size = int(os.environ['WORLD_SIZE'])
@@ -279,24 +287,10 @@ def train(train_loader, net, optim, curr_epoch, writer):
         curr_iter += 1
 
         if args.local_rank == 0:
-            if args.joint_edgeseg_loss:
-                msg = '[epoch {}], [iter {} / {}], [seg main loss {:0.6f}], [seg body loss {:0.6f}],[seg_edg_loss {:0.6f}],' \
-                      '[edge_attention_loss {:0.6f}],[lr {:0.6f}]'.format(
-                    curr_epoch, i + 1, len(train_loader), main_loss_dic['seg_loss'],main_loss_dic['seg_body'],
-                    main_loss_dic['edge_loss'],main_loss_dic['edge_ohem_loss'],
-                    optim.param_groups[-1]['lr'])
-            else:
-                msg = '[epoch {}], [iter {} / {}], [train main loss {:0.6f}], [lr {:0.6f}]'.format(
+            msg = '[epoch {}], [iter {} / {}], [train main loss {:0.6f}], [lr {:0.6f}]'.format(
                     curr_epoch, i + 1, len(train_loader), train_main_loss.avg,
                     optim.param_groups[-1]['lr'])
-
             logging.info(msg)
-
-            # Log tensorboard metrics for each iteration of the training phase
-            writer.add_scalar('training/loss', (train_main_loss.val),
-                              curr_iter)
-            writer.add_scalar('training/lr', optim.param_groups[-1]['lr'],
-                              curr_iter)
 
         if i > 5 and args.test_mode:
             return
@@ -339,7 +333,7 @@ def validate(val_loader, net, criterion, optim, curr_epoch, writer):
         # Logging
         if val_idx % 20 == 0:
             if args.local_rank == 0:
-                logging.info("validating: %d / %d", val_idx + 1, len(val_loader))
+                print("validating: {} / {}".format(val_idx + 1, len(val_loader)))
         if val_idx > 10 and args.test_mode:
             break
 
@@ -375,7 +369,7 @@ def evaluate(val_loader, net, args):
         Fpc = np.zeros((args.dataset_cls.num_classes))
         Fc = np.zeros((args.dataset_cls.num_classes))
         val_loader.sampler.set_epoch( i + 1)
-        evaluate_F_score(val_loader,net,thresh,Fpc,Fc)
+        evaluate_F_score(val_loader, net, thresh, Fpc, Fc)
 
 
 def evaluate_F_score(val_loader, net, thresh, Fpc, Fc):
@@ -390,7 +384,7 @@ def evaluate_F_score(val_loader, net, thresh, Fpc, Fc):
 
         seg_predictions = seg_out.data.max(1)[1].cpu()
 
-        print('evaluating: %d / %d' % (vi + 1, len(val_loader)))
+        logging.info('evaluating: %d / %d' % (vi + 1, len(val_loader)))
         _Fpc, _Fc = eval_mask_boundary(seg_predictions.numpy(), mask.numpy(), args.dataset_cls.num_classes,
                                        bound_th=float(thresh))
         Fc += _Fc
@@ -407,9 +401,9 @@ def evaluate_F_score(val_loader, net, thresh, Fpc, Fc):
         Fpc = Fpc_tensor.cpu().numpy()
 
     if args.local_rank == 0:
-        logging.info('Threshold: ' + thresh)
-        logging.info('F_Score: ' + str(np.sum(Fpc / Fc) / args.dataset_cls.num_classes))
-        logging.info('F_Score (Classwise): ' + str(Fpc / Fc))
+        print('Threshold: ' + thresh)
+        print('F_Score: ' + str(np.sum(Fpc / Fc) / args.dataset_cls.num_classes))
+        print('F_Score (Classwise): ' + str(Fpc / Fc))
 
     return Fpc
 

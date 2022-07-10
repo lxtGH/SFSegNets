@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from network.nn.operators import PSPModule, Aux_Module
+import network.nn.mynn as mynn
+
 model_urls = {
     'dfv1': './pretrained_models/df1_imagenet.pth',
     'dfv2': './pretrained_models/df2_imagenet.pth',
@@ -67,7 +69,7 @@ class BasicBlock(nn.Module):
 
 
 class dfnetv1(nn.Module):
-    def __init__(self, num_classes=1000, norm_layer=nn.BatchNorm2d, stride=32):
+    def __init__(self, num_classes=1000, norm_layer=mynn.Norm2d, stride=32):
         super(dfnetv1, self).__init__()
         self.inplanes = 64
         self.out_planes = 512
@@ -124,7 +126,7 @@ class dfnetv1(nn.Module):
 
 
 class dfnetv2(nn.Module):
-    def __init__(self, num_classes=1000, norm_layer=nn.BatchNorm2d, stride=32):
+    def __init__(self, num_classes=1000, norm_layer=mynn.Norm2d, stride=32):
         super(dfnetv2, self).__init__()
         self.inplanes = 64
         self.out_planes = 512
@@ -187,7 +189,7 @@ class DFSegnet(nn.Module):
     def __init__(self, num_classes, trunk="dfv1", inner_planes=128, criterion=None):
         super(DFSegnet, self).__init__()
         in_planes = 512
-        norm_layer = nn.BatchNorm2d
+        norm_layer = mynn.Norm2d
         if trunk == 'dfv1':
             self.backbone = DFNetv1(pretrained=True, norm_layer=norm_layer)
         elif trunk == 'dfv2':
@@ -227,7 +229,6 @@ class DFSegnet(nn.Module):
         return pred
 
 
-
 def DFNetv1(pretrained=True, **kwargs):
     """
         Init model
@@ -246,3 +247,11 @@ def DFNetv2(pretrained=True, **kwargs):
     if pretrained:
         model.load_state_dict(torch.load(model_urls['dfv2'], map_location="cpu"),strict=False)
     return model
+
+
+def DFSegNetv1(num_classes,  criterion):
+    return DFSegnet(num_classes, trunk='dfv1', criterion=criterion)
+
+
+def DFSegNetv2(num_classes,  criterion):
+    return DFSegnet(num_classes, trunk='dfv2', criterion=criterion)

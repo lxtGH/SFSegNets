@@ -7,7 +7,8 @@ from datasets import mapillary
 from datasets import kitti
 from datasets import camvid
 from datasets import bdd
-
+from datasets import idd
+from datasets import merged_auto_dataset
 import torchvision.transforms as standard_transforms
 
 import transforms.joint_transforms as joint_transforms
@@ -41,6 +42,13 @@ def setup_loaders(args):
             args.val_batch_size = args.bs_mult_val * args.ngpu
         else:
             args.val_batch_size = args.bs_mult * args.ngpu
+    elif args.dataset == 'merged_dataset':
+        args.dataset_cls = merged_auto_dataset
+        args.train_batch_size = args.bs_mult * args.ngpu
+        if args.bs_mult_val > 0:
+            args.val_batch_size = args.bs_mult_val * args.ngpu
+        else:
+            args.val_batch_size = args.bs_mult * args.ngpu
     elif args.dataset == 'camvid':
         args.dataset_cls = camvid
         args.train_batch_size = args.bs_mult * args.ngpu
@@ -50,6 +58,13 @@ def setup_loaders(args):
             args.val_batch_size = args.bs_mult * args.ngpu
     elif args.dataset == 'bdd':
         args.dataset_cls = bdd
+        args.train_batch_size = args.bs_mult * args.ngpu
+        if args.bs_mult_val > 0:
+            args.val_batch_size = args.bs_mult_val * args.ngpu
+        else:
+            args.val_batch_size = args.bs_mult * args.ngpu
+    elif args.dataset == 'idd':
+        args.dataset_cls = idd
         args.train_batch_size = args.bs_mult * args.ngpu
         if args.bs_mult_val > 0:
             args.val_batch_size = args.bs_mult_val * args.ngpu
@@ -118,9 +133,10 @@ def setup_loaders(args):
 
     edge_map = args.joint_edgeseg_loss
     if args.dataset == 'cityscapes':
-        # if args.mode == "trainval":
-        # city_mode = 'train'  ## Can be trainval, hard code
-        city_mode = 'train'
+        if args.mode == "trainval":
+            city_mode = 'trainval'  ## Can be trainval, hard code
+        else:
+            city_mode = 'train'
         city_quality = 'fine'
 
         if args.class_uniform_pct:
@@ -157,10 +173,13 @@ def setup_loaders(args):
                                               target_transform=target_transform,
                                               cv_split=args.cv)
     elif args.dataset == 'mapillary':
+        # eval_size = 1536
         eval_size = 1536
         val_joint_transform_list = [
             joint_transforms.ResizeHeight(eval_size),
             joint_transforms.CenterCropPad(eval_size)]
+
+
         train_set = args.dataset_cls.Mapillary(
             'semantic', 'train',
             joint_transform_list=train_joint_transform_list,
@@ -175,6 +194,47 @@ def setup_loaders(args):
             joint_transform_list=val_joint_transform_list,
             transform=val_input_transform,
             target_transform=target_transform,
+            class_uniform_pct=0,
+            test=False)
+
+    elif args.dataset == 'merged_dataset':
+        # eval_size = 1536
+        eval_size_w, eval_size_h = 2048, 1024
+        val_joint_transform_list = [
+            joint_transforms.ResizeHW(eval_size_w, eval_size_h), ]
+
+        train_set = args.dataset_cls.MergeDrivingDataset(
+            'semantic', 'train',
+            joint_transform_list=train_joint_transform_list,
+            transform=train_input_transform,
+            target_transform=target_train_transform,
+            dump_images=args.dump_augmentation_images,
+            class_uniform_pct=args.class_uniform_pct,
+            class_uniform_tile=args.class_uniform_tile,
+            test=args.test_mode)
+        val_set = args.dataset_cls.MergeDrivingDataset(
+            'semantic', 'val',
+            joint_transform_list=val_joint_transform_list,
+            transform=val_input_transform,
+            target_transform=target_transform,
+            class_uniform_pct=0,
+            test=False)
+
+    elif args.dataset == 'idd':
+
+        train_set = args.dataset_cls.IDDUniform(
+            'semantic', 'train',
+            joint_transform_list=train_joint_transform_list,
+            transform=train_input_transform,
+            target_transform=target_train_transform,
+            class_uniform_pct=args.class_uniform_pct,
+            class_uniform_tile=args.class_uniform_tile,
+            test=args.test_mode)
+        val_set = args.dataset_cls.IDDUniform(
+            'semantic', 'val',
+            transform=val_input_transform,
+            target_transform=target_transform,
+            class_uniform_pct=0,
             test=False)
 
     elif args.dataset == 'kitti':

@@ -264,17 +264,6 @@ class CAMVID(data.Dataset):
                 else:
                     img, mask = xform(img, mask)
 
-        # Debug
-        if self.dump_images and centroid is not None:
-            outdir = './dump_imgs_{}'.format(self.mode)
-            os.makedirs(outdir, exist_ok=True)
-            dump_img_name = trainid_to_name[class_id] + '_' + img_name
-            out_img_fn = os.path.join(outdir, dump_img_name + '.png')
-            out_msk_fn = os.path.join(outdir, dump_img_name + '_mask.png')
-            mask_img = colorize_mask(np.array(mask))
-            img.save(out_img_fn)
-            mask_img.save(out_msk_fn)
-
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
@@ -286,7 +275,7 @@ class CAMVID(data.Dataset):
             _edgemap = mask[:-1, :, :]
             _edgemap = edge_utils.onehot_to_binary_edges(_edgemap, 2, num_classes)
             edgemap = torch.from_numpy(_edgemap).float()
-            # print(img.shape, mask.shape, edgemap.shape)
+
             return img, mask, edgemap, img_name
         return img, mask, img_name
 

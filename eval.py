@@ -28,7 +28,6 @@ import transforms.transforms as extended_transforms
 from config import assert_and_infer_cfg
 from datasets import cityscapes, kitti
 from optimizer import restore_snapshot
-import transforms.joint_transforms as joint_transforms
 
 from utils.my_data_parallel import MyDataParallel
 from utils.misc import fast_hist, save_log, per_class_iu, evaluate_eval_for_inference

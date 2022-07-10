@@ -1,6 +1,6 @@
 
 ## Here we give Five different datasets example including Mapillary Cityscapes, Camvid, KITTI and BDD.
-## To be note that we only use the pretrained WiderResNet model on Mapillary for fair comparison on Cityscapes.
+## Consider Use the soft-link to generate these datasets.
 
 ## Mapillary Vistas Dataset
 
@@ -161,6 +161,45 @@ BDD seg
 │   ├── train
 │   ├── val
 ```
+
+## IDD Dataset 
+
+Please download the IDD dataset [webpage](https://idd.insaan.iiit.ac.in/)
+Also, you should tranform the json file to PNG file. refer to this [link](https://github.com/mseg-dataset/mseg-api/blob/master/download_scripts/mseg_remap_idd.sh#L17)
+
+
+```
+IDD seg
+├── leftImg8bit/
+│   ├── train
+│   ├── val
+│   ├── test
+├── gtFine/
+│   ├── train
+│   ├── val
+```
+
+## Unified Driving Segmentation dataset (UDS)
+
+*Make Sure all previous steps are correct.*
+
+run mapillary_to_city.py
+
+run idd_to_city.py 
+
+to pre-pare the mapillaray and IDD dataset labels for UDS dataset (generate new labels).
+
+The final dataset structure is: 
+
+```
+├── data/
+│   ├── bdd
+│   ├── cityscapes
+│   ├── IDD
+│   ├── mapillary
+```
+
+#### Soft Link to the data floder 
 After that, you can either change the `config.py` or do the soft link according to the default path in config.
 
 For example, 
