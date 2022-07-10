@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 EXP_DIR=./sfnets/stdc2_SFV2_spatial_atten
 mkdir -p ${EXP_DIR}
-srun -p pat_saturn -n1 --gres=gpu:8 --cpus-per-task 5 \
 python -m torch.distributed.launch --nproc_per_node=8 --master_port 29501 train.py \
   --dataset cityscapes \
   --cv 0 \

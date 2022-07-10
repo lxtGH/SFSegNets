@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 now=$(date +"%Y%m%d_%H%M%S")
-EXP_DIR=./sfnets/sf_r18_v2_spatial_atten_1000e
+EXP_DIR=./sfnets/bdd/sfnet_dfv2_350e
 mkdir -p ${EXP_DIR}
-python -m torch.distributed.launch --nproc_per_node=8 --master_port 29501 train.py \
-  --dataset cityscapes \
+python -m torch.distributed.launch --nproc_per_node=8 train.py \
+  --dataset bdd \
   --cv 0 \
-  --arch network.sfnet_resnet.DeepR18_SFV2_deeply_dsn_FA_Atten \
-  --class_uniform_pct 0.5 \
+  --arch network.sfnet_dfnet.AlignedDFnetv2 \
+  --class_uniform_pct 0.0 \
   --class_uniform_tile 1024 \
   --lr 0.01 \
   --lr_schedule poly \
@@ -16,17 +16,15 @@ python -m torch.distributed.launch --nproc_per_node=8 --master_port 29501 train.
   --syncbn \
   --sgd \
   --ohem \
-  --fpn_dsn_loss \
   --crop_size 1024 \
   --scale_min 0.5 \
   --scale_max 2.0 \
   --color_aug 0.25 \
   --gblur \
-  --max_epoch 1000 \
-  --coarse_boost_classes 14,15,16,3,12,17,4 \
+  --max_epoch 350 \
   --wt_bound 1.0 \
-  --bs_mult 2 \
+  --bs_mult 4 \
   --apex \
-  --exp cityscapes_SFsegnet_res18 \
+  --exp bdd \
   --ckpt ${EXP_DIR}/ \
   --tb_path ${EXP_DIR}/ \
