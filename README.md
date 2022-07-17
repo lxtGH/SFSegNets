@@ -94,7 +94,32 @@ sfnet_lite_stdcv1: [link](https://drive.google.com/file/d/1DAZhnklnBKIbQZprCB1N1
 
 ##### Unified Driving Segmentation dataset ckpts:
 
-To be released 
+sfnet_lite_r18: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQwhOL4whiHtNrye?e=4yW5aM)
+
+sfnet_lite_stdcv1: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQopAjfwiFSotuWW?e=h5NUgw)
+
+sfnet_lite_stdcv2: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQtmYXGHgyUnPUhn?e=GBHjq2)
+
+
+#### IDD dataset
+
+sfnet_lite_r18: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQ6f8-aRMV-p9OGs?e=3NodMB)
+
+sfnet_lite_stdcv1: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQ2qAkSh9gI9ix8b?e=rXrmkB)
+
+sfnet_lite_stdcv2: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgQ-Pchi1UaEtW_Rv?e=OAFU6Y)
+
+
+#### BDD dataset 
+
+sfnet_lite_r18: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgRLCAX25vKyQ-R4f?e=5BNIcR)
+
+sfnet_r18: [link](https://1drv.ms/u/s!Ai4mxaXd6lVBgRFZnJjcIxNNS8jS?e=em7RTQ)
+
+
+#### Mapillary dataset 
+
+to be release. 
 
 
 ## Demo 
@@ -151,6 +176,13 @@ If you find this repo is useful for your research, Please consider citing our pa
 
 
 ```
+@article{Li2022SFNetFA,
+  title={SFNet: Faster, Accurate, and Domain Agnostic Semantic Segmentation via Semantic Flow},
+  author={Xiangtai Li and Jiangning Zhang and Yibo Yang and Guangliang Cheng and Kuiyuan Yang and Yu Tong and Dacheng Tao},
+  journal={ArXiv},
+  year={2022},
+  volume={abs/2207.04415}
+}
 @inproceedings{sfnet,
   title={Semantic Flow for Fast and Accurate Scene Parsing},
   author={Li, Xiangtai and You, Ansheng and Zhu, Zhen and Zhao, Houlong and Yang, Maoke and Yang, Kuiyuan and Tong, Yunhai},
