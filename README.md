@@ -1,5 +1,7 @@
-# SFSegNets(ECCV-2020-oral) and SFNet-Lite (Extension)
+# SFSegNets(ECCV-2020-oral) and SFNet-Lite (Extension, IJCV-2023)
 Reproduced Implementation of Our ECCV-2020 oral paper: Semantic Flow for Fast and Accurate Scene Parsing.
+
+**News! SFNet-Lite is accepted by IJCV!! A good end to my last work in the PhD study!!!**
 
 **Extension: SFNet-Lite achieve 78.8 mIoU while running 120 FPS, 80.1 mIoU while running at 50 FPS on TITAN-RTX.**
 
@@ -179,9 +181,8 @@ If you find this repo is useful for your research, Please consider citing our pa
 @article{Li2022SFNetFA,
   title={SFNet: Faster, Accurate, and Domain Agnostic Semantic Segmentation via Semantic Flow},
   author={Xiangtai Li and Jiangning Zhang and Yibo Yang and Guangliang Cheng and Kuiyuan Yang and Yu Tong and Dacheng Tao},
-  journal={ArXiv},
-  year={2022},
-  volume={abs/2207.04415}
+  journal={IJCV},
+  year={2023},
 }
 @inproceedings{sfnet,
   title={Semantic Flow for Fast and Accurate Scene Parsing},
