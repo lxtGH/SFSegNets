@@ -179,7 +179,7 @@ If you find this repo is useful for your research, Please consider citing our pa
 
 ```
 @article{Li2022SFNetFA,
-  title={SFNet: Faster, Accurate, and Domain Agnostic Semantic Segmentation via Semantic Flow},
+  title={SFNet: Faster and Accurate Domain Agnostic Semantic Segmentation via Semantic Flow},
   author={Xiangtai Li and Jiangning Zhang and Yibo Yang and Guangliang Cheng and Kuiyuan Yang and Yu Tong and Dacheng Tao},
   journal={IJCV},
   year={2023},
