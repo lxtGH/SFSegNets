@@ -58,7 +58,7 @@ class SRNet(nn.Module):
         else:
             print("Not using Dilation ")
 
-        self.head = ModuleHead(2048, 512, 512, num_classes, module=ChannelReasonModule(512, 256))
+        self.head = ModuleHead(2048, 512, num_classes, module=ChannelReasonModule(512, 256))
         self.aux_layer = Aux_Module(1024, num_classes, norm_layer=Norm2d)
 
         initialize_weights(self.head)
